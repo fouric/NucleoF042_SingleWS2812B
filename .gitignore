@@ -14,3 +14,6 @@
 *.o
 *.elf
 *.hex
+
+# i don't even know
+*.map
