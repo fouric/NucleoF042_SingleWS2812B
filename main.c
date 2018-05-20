@@ -15,71 +15,11 @@ extern unsigned char  INIT_DATA_END;
 extern unsigned char  BSS_START;
 extern unsigned char  BSS_END;
 
-void initClock2() {
-  // check to see if we've already init
-  if (FLASH_ACR == 1) {
-    // This is potentially a dangerous function as it could
-    // result in a system with an invalid clock signal - result: a stuck system
-    // Set the PLL up
-    // First ensure PLL is disabled
-    RCC_CR &= ~BIT24;
-    while( (RCC_CR & BIT25)); // wait for PLL ready to be cleared
-    // set PLL multiplier to 12 (yielding 48MHz)
-    // Warning here: if system clock is greater than 24MHz then wait-state(s) need to be
-    // inserted into Flash memory interface
-    FLASH_ACR |= BIT0;
-    FLASH_ACR &=~(BIT2 | BIT1);
-
-    // Turn on FLASH prefetch buffer
-    FLASH_ACR |= BIT4;
-    RCC_CFGR &= ~(BIT21 | BIT20 | BIT19 | BIT18);
-    RCC_CFGR |= (BIT21 | BIT19 );
-
-    // Need to limit ADC clock to below 14MHz so will change ADC prescaler to 4
-    RCC_CFGR |= BIT14;
-
-    // Do the following to push HSI clock out on PA8 (MCO)
-    // for measurement purposes.  Should be 8MHz or thereabouts (verified with oscilloscope)
-    /*
-      RCC_CFGR |= ( BIT26 | BIT24 );
-      RCC_AHBENR |= BIT17;
-      GPIOA_MODER |= BIT17;
-    */
-
-    // and turn the PLL back on again
-    RCC_CR |= BIT24;
-    // set PLL as system clock source
-    RCC_CFGR |= BIT1;
-  }
-}
-
-void initThings() {
-  // do global/static data initialization
-  unsigned char *src;
-  unsigned char *dest;
-  unsigned len;
-  initClock2(); // Push CPU up to 48MHz (Gonna need it)
-  src = &INIT_DATA_VALUES;
-  dest = &INIT_DATA_START;
-  len = &INIT_DATA_END-&INIT_DATA_START;
-  while (len--) {
-    *dest++ = *src++;
-  }
-  // zero out the uninitialized global/static variables
-  dest = &BSS_START;
-  len = &BSS_END - &BSS_START;
-  while (len--) {
-    *dest++ = 0;
-  }
-}
-
 void delay(int);
 
 void delay(int dly) {
   while( dly--);
 }
-
-
 
 void configPins() {
   // Power up PORTB
@@ -99,21 +39,17 @@ void writeWS2812B(unsigned long Value) {
   // Process the GREEN byte
   Index=0;
   Encoding=0;
-  while (Index < 8)
-    {
-      Encoding = Encoding << 3;
-      if (Value & BIT23)
-        {
-          Encoding |= 0b110;
-        }
-      else
-        {
-          Encoding |= 0b100;
-        }
-      Value = Value << 1;
-      Index++;
-
+  while (Index < 8) {
+    Encoding = Encoding << 3;
+    if (Value & BIT23) {
+      Encoding |= 0b110;
+    } else {
+      Encoding |= 0b100;
     }
+    Value = Value << 1;
+    Index++;
+
+  }
   SPI_Data[0] = ((Encoding >> 16) & 0xff);
   SPI_Data[1] = ((Encoding >> 8) & 0xff);
   SPI_Data[2] = (Encoding & 0xff);
@@ -121,21 +57,17 @@ void writeWS2812B(unsigned long Value) {
   // Process the RED byte
   Index=0;
   Encoding=0;
-  while (Index < 8)
-    {
-      Encoding = Encoding << 3;
-      if (Value & BIT23)
-        {
-          Encoding |= 0b110;
-        }
-      else
-        {
-          Encoding |= 0b100;
-        }
-      Value = Value << 1;
-      Index++;
-
+  while (Index < 8) {
+    Encoding = Encoding << 3;
+    if (Value & BIT23) {
+      Encoding |= 0b110;
+    } else {
+      Encoding |= 0b100;
     }
+    Value = Value << 1;
+    Index++;
+
+  }
   SPI_Data[3] = ((Encoding >> 16) & 0xff);
   SPI_Data[4] = ((Encoding >> 8) & 0xff);
   SPI_Data[5] = (Encoding & 0xff);
@@ -143,22 +75,17 @@ void writeWS2812B(unsigned long Value) {
   // Process the BLUE byte
   Index=0;
   Encoding=0;
-  while (Index < 8)
-    {
-      Encoding = Encoding << 3;
-      if (Value & BIT23)
-        {
-          Encoding |= 0b110;
-        }
-      else
-        {
-          Encoding |= 0b100;
-        }
-      Value = Value << 1;
-      Index++;
-
+  while (Index < 8) {
+    Encoding = Encoding << 3;
+    if (Value & BIT23) {
+      Encoding |= 0b110;
+    } else {
+      Encoding |= 0b100;
     }
-  SPI_Data[6] = ((Encoding >> 16) & 0xff);
+    Value = Value << 1;
+    Index++;
+  }
+
   SPI_Data[7] = ((Encoding >> 8) & 0xff);
   SPI_Data[8] = (Encoding & 0xff);
 
@@ -166,6 +93,7 @@ void writeWS2812B(unsigned long Value) {
   writeSPI(SPI_Data,9);
 
 }
+
 unsigned long getRainbow() {   // Cycle through the colours of the rainbow (non-uniform brightness however)
   // Inspired by : http://academe.co.uk/2012/04/arduino-cycling-through-colours-of-the-rainbow/
   static unsigned Red = 255;
@@ -214,18 +142,57 @@ unsigned long getRainbow() {   // Cycle through the colours of the rainbow (non-
 }
 
 
+void initClock() {
+  if (FLASH_ACR == 0) {
+    // This is potentially a dangerous function as it could
+    // result in a system with an invalid clock signal - result: a stuck system
+    // Set the PLL up
+    // First ensure PLL is disabled
+    RCC_CR &= ~BIT24;
+    while( (RCC_CR & BIT25)); // wait for PLL ready to be cleared
+    // set PLL multiplier to 12 (yielding 48MHz)
+    // Warning here: if system clock is greater than 24MHz then wait-state(s) need to be
+    // inserted into Flash memory interface
+    FLASH_ACR |= BIT0;
+    FLASH_ACR &=~(BIT2 | BIT1);
+
+    // Turn on FLASH prefetch buffer
+    FLASH_ACR |= BIT4;
+    RCC_CFGR &= ~(BIT21 | BIT20 | BIT19 | BIT18);
+    RCC_CFGR |= (BIT21 | BIT19 );
+
+    // Need to limit ADC clock to below 14MHz so will change ADC prescaler to 4
+    RCC_CFGR |= BIT14;
+
+    // Do the following to push HSI clock out on PA8 (MCO)
+    // for measurement purposes.  Should be 8MHz or thereabouts (verified with oscilloscope)
+    /*
+      RCC_CFGR |= ( BIT26 | BIT24 );
+      RCC_AHBENR |= BIT17;
+      GPIOA_MODER |= BIT17;
+    */
+
+    // and turn the PLL back on again
+    RCC_CR |= BIT24;
+    // set PLL as system clock source
+    RCC_CFGR |= BIT1;
+  }
+}
+
 int main() {
   //unsigned count=0;
-  initThings();
 
-  //initUART(9600);  // Set serial port to 9600,n,8,1
+  initClock();
+
+  initUART(9600);  // Set serial port to 9600,n,8,1
+
   configPins(); // Set up the pin to drive the onboard LDE
   initSPI(); // set up the SPI bus
 
   while(1) {
     GPIOB_ODR |= BIT3;	// LED on
     writeWS2812B(getRainbow()); // Output a colour Format: GGRRBB
-    //delay(10000); // Wait for a while so we can see it
+    delay(5000); // Wait for a while so we can see it
     delay(1000); // Wait for a while so we can see it
     GPIOB_ODR &= ~BIT3; // LED off
     //delay(10000); // Wait for a while so we can see it
