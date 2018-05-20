@@ -35,34 +35,34 @@ LOAD /usr/lib/gcc/arm-none-eabi/5.4.1/armv6-m/libgcc.a
  .vectors       0x0000000008000000       0xc0 init.o
                 0x0000000008000000                Vectors
  *(.text)
- .text          0x00000000080000c0      0x120 init.o
-                0x00000000080000c0                initClock
-                0x0000000008000160                init
-                0x00000000080001d8                Default_Handler
- .text          0x00000000080001e0      0x5ac serial.o
-                0x00000000080001e0                ReadCom
-                0x0000000008000254                WriteCom
-                0x00000000080002f0                initUART
-                0x0000000008000464                isr_usart2
-                0x0000000008000490                usart_rx
-                0x00000000080004c0                usart_tx
-                0x0000000008000538                usart_tx_busy
-                0x0000000008000568                PutBuf
-                0x00000000080005c8                GetBuf
-                0x000000000800061c                GetBufCount
-                0x0000000008000630                eputs
-                0x000000000800066c                egets
-                0x00000000080006fc                HexDigit
-                0x000000000800072c                printHex
- .text          0x000000000800078c      0x10c spi.o
-                0x000000000800078c                initSPI
-                0x0000000008000850                writeSPI
- .text          0x0000000008000898      0x2e0 main.o
-                0x0000000008000898                delay
-                0x00000000080008b4                configPins
-                0x00000000080008ec                writeWS2812B
-                0x0000000008000a2c                getRainbow
-                0x0000000008000b24                main
+ .text          0x00000000080000c0       0x7c init.o
+                0x00000000080000c0                init
+                0x0000000008000134                Default_Handler
+ .text          0x000000000800013c      0x5ac serial.o
+                0x000000000800013c                ReadCom
+                0x00000000080001b0                WriteCom
+                0x000000000800024c                initUART
+                0x00000000080003c0                isr_usart2
+                0x00000000080003ec                usart_rx
+                0x000000000800041c                usart_tx
+                0x0000000008000494                usart_tx_busy
+                0x00000000080004c4                PutBuf
+                0x0000000008000524                GetBuf
+                0x0000000008000578                GetBufCount
+                0x000000000800058c                eputs
+                0x00000000080005c8                egets
+                0x0000000008000658                HexDigit
+                0x0000000008000688                printHex
+ .text          0x00000000080006e8      0x10c spi.o
+                0x00000000080006e8                initSPI
+                0x00000000080007ac                writeSPI
+ .text          0x00000000080007f4      0x384 main.o
+                0x00000000080007f4                delay
+                0x0000000008000810                configPins
+                0x0000000008000848                writeWS2812B
+                0x0000000008000988                getRainbow
+                0x0000000008000a80                initClock
+                0x0000000008000b28                main
  .text          0x0000000008000b78      0x1d4 /usr/lib/gcc/arm-none-eabi/5.4.1/armv6-m/libgcc.a(_divsi3.o)
                 0x0000000008000b78                __aeabi_idiv
                 0x0000000008000b78                __divsi3
@@ -126,21 +126,21 @@ LOAD /usr/lib/gcc/arm-none-eabi/5.4.1/armv6-m/libgcc.a
                 0x00000000200000b4                BSS_END = .
 OUTPUT(main.elf elf32-littlearm)
 
-.debug_info     0x0000000000000000      0x89b
- .debug_info    0x0000000000000000      0x116 init.o
- .debug_info    0x0000000000000116      0x394 serial.o
- .debug_info    0x00000000000004aa       0xcb spi.o
- .debug_info    0x0000000000000575      0x1b4 main.o
- .debug_info    0x0000000000000729       0xb9 /usr/lib/gcc/arm-none-eabi/5.4.1/armv6-m/libgcc.a(_divsi3.o)
- .debug_info    0x00000000000007e2       0xb9 /usr/lib/gcc/arm-none-eabi/5.4.1/armv6-m/libgcc.a(_dvmd_tls.o)
+.debug_info     0x0000000000000000      0x878
+ .debug_info    0x0000000000000000       0xf1 init.o
+ .debug_info    0x00000000000000f1      0x394 serial.o
+ .debug_info    0x0000000000000485       0xcb spi.o
+ .debug_info    0x0000000000000550      0x1b6 main.o
+ .debug_info    0x0000000000000706       0xb9 /usr/lib/gcc/arm-none-eabi/5.4.1/armv6-m/libgcc.a(_divsi3.o)
+ .debug_info    0x00000000000007bf       0xb9 /usr/lib/gcc/arm-none-eabi/5.4.1/armv6-m/libgcc.a(_dvmd_tls.o)
 
-.debug_abbrev   0x0000000000000000      0x3e5
- .debug_abbrev  0x0000000000000000       0xe8 init.o
- .debug_abbrev  0x00000000000000e8      0x155 serial.o
- .debug_abbrev  0x000000000000023d       0x7f spi.o
- .debug_abbrev  0x00000000000002bc      0x101 main.o
- .debug_abbrev  0x00000000000003bd       0x14 /usr/lib/gcc/arm-none-eabi/5.4.1/armv6-m/libgcc.a(_divsi3.o)
- .debug_abbrev  0x00000000000003d1       0x14 /usr/lib/gcc/arm-none-eabi/5.4.1/armv6-m/libgcc.a(_dvmd_tls.o)
+.debug_abbrev   0x0000000000000000      0x3ae
+ .debug_abbrev  0x0000000000000000       0xb1 init.o
+ .debug_abbrev  0x00000000000000b1      0x155 serial.o
+ .debug_abbrev  0x0000000000000206       0x7f spi.o
+ .debug_abbrev  0x0000000000000285      0x101 main.o
+ .debug_abbrev  0x0000000000000386       0x14 /usr/lib/gcc/arm-none-eabi/5.4.1/armv6-m/libgcc.a(_divsi3.o)
+ .debug_abbrev  0x000000000000039a       0x14 /usr/lib/gcc/arm-none-eabi/5.4.1/armv6-m/libgcc.a(_dvmd_tls.o)
 
 .debug_aranges  0x0000000000000000       0xc0
  .debug_aranges
@@ -157,22 +157,22 @@ OUTPUT(main.elf elf32-littlearm)
                 0x00000000000000a0       0x20 /usr/lib/gcc/arm-none-eabi/5.4.1/armv6-m/libgcc.a(_dvmd_tls.o)
 
 .debug_line     0x0000000000000000      0x3e6
- .debug_line    0x0000000000000000       0x60 init.o
- .debug_line    0x0000000000000060      0x102 serial.o
- .debug_line    0x0000000000000162       0xa3 spi.o
- .debug_line    0x0000000000000205      0x112 main.o
+ .debug_line    0x0000000000000000       0x4a init.o
+ .debug_line    0x000000000000004a      0x102 serial.o
+ .debug_line    0x000000000000014c       0xa3 spi.o
+ .debug_line    0x00000000000001ef      0x128 main.o
  .debug_line    0x0000000000000317       0x71 /usr/lib/gcc/arm-none-eabi/5.4.1/armv6-m/libgcc.a(_divsi3.o)
  .debug_line    0x0000000000000388       0x5e /usr/lib/gcc/arm-none-eabi/5.4.1/armv6-m/libgcc.a(_dvmd_tls.o)
 
-.debug_str      0x0000000000000000      0x2fa
- .debug_str     0x0000000000000000      0x129 init.o
-                                        0x136 (size before relaxing)
- .debug_str     0x0000000000000129      0x10a serial.o
+.debug_str      0x0000000000000000      0x2f4
+ .debug_str     0x0000000000000000      0x11a init.o
+                                        0x127 (size before relaxing)
+ .debug_str     0x000000000000011a      0x10a serial.o
                                         0x1e8 (size before relaxing)
- .debug_str     0x0000000000000233       0x63 spi.o
+ .debug_str     0x0000000000000224       0x63 spi.o
                                         0x151 (size before relaxing)
- .debug_str     0x0000000000000296       0x64 main.o
-                                        0x1b6 (size before relaxing)
+ .debug_str     0x0000000000000287       0x6d main.o
+                                        0x1ba (size before relaxing)
 
 .comment        0x0000000000000000       0x2b
  .comment       0x0000000000000000       0x2b init.o
@@ -196,12 +196,12 @@ OUTPUT(main.elf elf32-littlearm)
  .ARM.attributes
                 0x00000000000000e2       0x1e /usr/lib/gcc/arm-none-eabi/5.4.1/armv6-m/libgcc.a(_dvmd_tls.o)
 
-.debug_frame    0x0000000000000000      0x340
- .debug_frame   0x0000000000000000       0x68 init.o
- .debug_frame   0x0000000000000068      0x1c4 serial.o
- .debug_frame   0x000000000000022c       0x4c spi.o
- .debug_frame   0x0000000000000278       0xa8 main.o
- .debug_frame   0x0000000000000320       0x20 /usr/lib/gcc/arm-none-eabi/5.4.1/armv6-m/libgcc.a(_divsi3.o)
+.debug_frame    0x0000000000000000      0x33c
+ .debug_frame   0x0000000000000000       0x4c init.o
+ .debug_frame   0x000000000000004c      0x1c4 serial.o
+ .debug_frame   0x0000000000000210       0x4c spi.o
+ .debug_frame   0x000000000000025c       0xc0 main.o
+ .debug_frame   0x000000000000031c       0x20 /usr/lib/gcc/arm-none-eabi/5.4.1/armv6-m/libgcc.a(_divsi3.o)
 
 Cross Reference Table
 
@@ -237,7 +237,7 @@ egets                                             serial.o
 eputs                                             serial.o
 getRainbow                                        main.o
 init                                              init.o
-initClock                                         init.o
+initClock                                         main.o
 initSPI                                           spi.o
                                                   main.o
 initUART                                          serial.o
