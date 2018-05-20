@@ -14,7 +14,7 @@ AS=arm-none-eabi-as
 # Specity the linker to use
 LD=arm-none-eabi-ld
 
-CCFLAGS=-mcpu=cortex-m0 -mthumb -g
+CCFLAGS=-mcpu=cortex-m0 -mthumb -g -Wall
 
 # List the object files involved in this project
 OBJS=	init.o \
@@ -44,5 +44,5 @@ spi.o: spi.c
 # if someone types in 'make clean' then remove all object files and executables
 # associated wit this project
 clean:
-	rm $(OBJS)
-	rm main.elf
+	rm -f $(OBJS)
+	rm -f main.elf

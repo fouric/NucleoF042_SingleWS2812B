@@ -7,6 +7,72 @@
 #include "stm32f042.h"
 #include "serial.h"
 #include "spi.h"
+
+// The following are 'declared' in the linker script
+extern unsigned char  INIT_DATA_VALUES;
+extern unsigned char  INIT_DATA_START;
+extern unsigned char  INIT_DATA_END;
+extern unsigned char  BSS_START;
+extern unsigned char  BSS_END;
+
+void initClock2() {
+  // check to see if we've already init
+  if (FLASH_ACR == 1) {
+    // This is potentially a dangerous function as it could
+    // result in a system with an invalid clock signal - result: a stuck system
+    // Set the PLL up
+    // First ensure PLL is disabled
+    RCC_CR &= ~BIT24;
+    while( (RCC_CR & BIT25)); // wait for PLL ready to be cleared
+    // set PLL multiplier to 12 (yielding 48MHz)
+    // Warning here: if system clock is greater than 24MHz then wait-state(s) need to be
+    // inserted into Flash memory interface
+    FLASH_ACR |= BIT0;
+    FLASH_ACR &=~(BIT2 | BIT1);
+
+    // Turn on FLASH prefetch buffer
+    FLASH_ACR |= BIT4;
+    RCC_CFGR &= ~(BIT21 | BIT20 | BIT19 | BIT18);
+    RCC_CFGR |= (BIT21 | BIT19 );
+
+    // Need to limit ADC clock to below 14MHz so will change ADC prescaler to 4
+    RCC_CFGR |= BIT14;
+
+    // Do the following to push HSI clock out on PA8 (MCO)
+    // for measurement purposes.  Should be 8MHz or thereabouts (verified with oscilloscope)
+    /*
+      RCC_CFGR |= ( BIT26 | BIT24 );
+      RCC_AHBENR |= BIT17;
+      GPIOA_MODER |= BIT17;
+    */
+
+    // and turn the PLL back on again
+    RCC_CR |= BIT24;
+    // set PLL as system clock source
+    RCC_CFGR |= BIT1;
+  }
+}
+
+void initThings() {
+  // do global/static data initialization
+  unsigned char *src;
+  unsigned char *dest;
+  unsigned len;
+  initClock2(); // Push CPU up to 48MHz (Gonna need it)
+  src = &INIT_DATA_VALUES;
+  dest = &INIT_DATA_START;
+  len = &INIT_DATA_END-&INIT_DATA_START;
+  while (len--) {
+    *dest++ = *src++;
+  }
+  // zero out the uninitialized global/static variables
+  dest = &BSS_START;
+  len = &BSS_END - &BSS_START;
+  while (len--) {
+    *dest++ = 0;
+  }
+}
+
 void delay(int);
 
 void delay(int dly) {
@@ -106,62 +172,63 @@ unsigned long getRainbow() {   // Cycle through the colours of the rainbow (non-
   static unsigned Green = 0;
   static unsigned Blue = 0;
   static int State = 0;
-  switch (State)
-    {
-    case 0:{
-      Green++;
-      if (Green == 255)
-        State = 1;
-      break;
-    }
-    case 1:{
-      Red--;
-      if (Red == 0)
-        State = 2;
-      break;
-    }
-    case 2:{
-      Blue++;
-      if (Blue == 255)
-        State = 3;
-      break;
-    }
-    case 3:{
-      Green--;
-      if (Green == 0)
-        State = 4;
-      break;
-    }
-    case 4:{
-      Red++;
-      if (Red == 255)
-        State = 5;
-      break;
-    }
-    case 5:{
-      Blue --;
-      if (Blue == 0)
-        State = 0;
-      break;
-    }
-    }
+  switch (State) {
+  case 0:{
+    Green++;
+    if (Green == 255)
+      State = 1;
+    break;
+  }
+  case 1:{
+    Red--;
+    if (Red == 0)
+      State = 2;
+    break;
+  }
+  case 2:{
+    Blue++;
+    if (Blue == 255)
+      State = 3;
+    break;
+  }
+  case 3:{
+    Green--;
+    if (Green == 0)
+      State = 4;
+    break;
+  }
+  case 4:{
+    Red++;
+    if (Red == 255)
+      State = 5;
+    break;
+  }
+  case 5:{
+    Blue --;
+    if (Blue == 0)
+      State = 0;
+    break;
+  }
+  }
   return (Green << 16) + (Red << 8) + Blue;
 }
 
 
 int main() {
-  unsigned count=0;
+  //unsigned count=0;
+  initThings();
 
-  initUART(9600);  // Set serial port to 9600,n,8,1
+  //initUART(9600);  // Set serial port to 9600,n,8,1
   configPins(); // Set up the pin to drive the onboard LDE
   initSPI(); // set up the SPI bus
 
   while(1) {
     GPIOB_ODR |= BIT3;	// LED on
     writeWS2812B(getRainbow()); // Output a colour Format: GGRRBB
-    delay(10000); // Wait for a while so we can see it
+    //delay(10000); // Wait for a while so we can see it
+    delay(1000); // Wait for a while so we can see it
     GPIOB_ODR &= ~BIT3; // LED off
-    delay(100000); // Wait for a while so we can see it
+    //delay(10000); // Wait for a while so we can see it
   }
   return 0;
 }

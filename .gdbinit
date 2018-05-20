@@ -2,17 +2,21 @@
 #set pagination off
 # Load the kernel into GDB
 #file src/main.elf
-#file main.elf
+file main.elf
 # TUI (Text User Interface)
-layout src
+layout split
 focus cmd
 # Connect to st-util
 tar extended-remote :4242
+#set disassembly-flavor intel
 # Load the kernel onto the target
-load
+#load
+
+#break *main
+
+#start
+
 # Set breakpoints
-#break *assert_failed
-#break *flextimus_prime_pause_pressed
 # Print backtrace when a breakpoint is hit
 # Re-enable pagination now that we are debugging
 #command 1

@@ -6,7 +6,7 @@
 // Similar to puts and gets in standard C however egets checks the size
 // of the input buffer.  This could be extended to include a timeout quite easily.
 // Written by Frank Duignan
-// 
+//
 
 // define the size of the communications buffer (adjust to suit)
 #define MAXBUFFER   64
@@ -22,7 +22,7 @@ int PutBuf(ComBuffer  *Buf,unsigned char Data);
 unsigned char GetBuf(ComBuffer  *Buf);
 unsigned GetBufCount(ComBuffer  *Buf);
 int ReadCom(int Max,unsigned char *Buffer);
-int WriteCom(int Count,unsigned char *Buffer);
+int WriteCom(int Count,char *Buffer);
 
 
 void usart_tx (void);
@@ -49,29 +49,29 @@ int ReadCom(int Max,unsigned char *Buffer)
 	}
 	else {
 		return(0);
-	}	
+	}
 };
-int WriteCom(int Count,unsigned char *Buffer)
+int WriteCom(int Count,char *Buffer)
 {
 // Writes Count bytes from Buffer into the the communications TX buffer
 // returns -1 if the port is not open (configured)
 // returns -2 if the message is too big to be sent
-// If the transmitter is idle it will initiate interrupts by 
+// If the transmitter is idle it will initiate interrupts by
 // writing the first character to the hardware transmit buffer
 	unsigned i,BufLen;
 	if (!ComOpen)
 		return (-1);
 	BufLen = GetBufCount(&ComTXBuffer);
 	if ( (MAXBUFFER - BufLen) < Count )
-		return (-2); 
+		return (-2);
 	for(i=0;i<Count;i++)
 		PutBuf(&ComTXBuffer,Buffer[i]);
-	
+
 	if ( (USART2_CR1 & BIT3)==0)
 	{ // transmitter was idle, turn it on and force out first character
 	  USART2_CR1 |= BIT3;
-	  USART2_TDR = GetBuf(&ComTXBuffer);		
-	} 
+	  USART2_TDR = GetBuf(&ComTXBuffer);
+	}
 	return 0;
 };
 
@@ -85,32 +85,32 @@ void initUART(int BaudRate) {
 	ComError = 0;
 // Turn on the clock for GPIOA (usart 1 uses it) - not sure if I need this
 	RCC_AHBENR  |= BIT17;
-// Turn on the clock for the USART2 peripheral	
+// Turn on the clock for the USART2 peripheral
 	RCC_APB1ENR |= BIT17;
 
-	
+
 // Configure the I/O pins.  Will use PA2 as TX and PA15 as RX
 	GPIOA_MODER |= (BIT5 | BIT31);
 	GPIOA_MODER &= ~BIT4;
 	GPIOA_MODER &= ~BIT30;
 // The alternate function number for PA2 and PA15 is AF1 (see datasheet, reference manual)
-	GPIOA_AFRL  &= ~(BIT11 | BIT10 | BIT9); 
+	GPIOA_AFRL  &= ~(BIT11 | BIT10 | BIT9);
 	GPIOA_AFRL  |= BIT8;
-	GPIOA_AFRH  &= ~(BIT31 | BIT30 | BIT29); 
-	GPIOA_AFRH  |= BIT28;	
-	
-	
-	BaudRateDivisor = 48000000;  // assuming 48MHz clock 
+	GPIOA_AFRH  &= ~(BIT31 | BIT30 | BIT29);
+	GPIOA_AFRH  |= BIT28;
+
+
+	BaudRateDivisor = 48000000;  // assuming 48MHz clock
 	BaudRateDivisor = BaudRateDivisor / (long) BaudRate;
 
-// De-assert reset of USART2 
+// De-assert reset of USART2
 	RCC_APB1RSTR &= ~BIT17;
 // Configure the USART
 // disable USART first to allow setting of other control bits
 // This also disables parity checking and enables 16 times oversampling
 
-	USART2_CR1 = 0; 
- 
+	USART2_CR1 = 0;
+
 // Don't want anything from CR2
 	USART2_CR2 = 0;
 
@@ -121,15 +121,15 @@ void initUART(int BaudRate) {
 	USART2_BRR = BaudRateDivisor;
 
 // Turn on Transmitter, Receiver, Transmit and Receive interrupts.
-	USART2_CR1 |= (BIT2  | BIT5 | BIT6); 
+	USART2_CR1 |= (BIT2  | BIT5 | BIT6);
 // Enable the USART
 	USART2_CR1 |= BIT0;
-// Enable USART2 interrupts in NVIC	
+// Enable USART2 interrupts in NVIC
 	ISER |= BIT28;
-// and enable interrupts 
+// and enable interrupts
 	enable_interrupts();
 }
-void isr_usart2() 
+void isr_usart2()
 {
 // check which interrupt happened.
       if (USART2_ISR & BIT7) // is it a TXE interrupt?
@@ -157,7 +157,7 @@ void usart_tx (void)
 		USART2_TDR=GetBuf(&ComTXBuffer);
 	else
 	{
-	  // No more data, disable the transmitter 
+	  // No more data, disable the transmitter
 	  USART2_CR1 &= ~BIT3;
 	  if (USART2_ISR & BIT6)
 	  // Write TCCF to USART_ICR
@@ -208,7 +208,7 @@ int eputs(char *s)
   // only writes to the comms port at the moment
   if (!ComOpen)
     return -1;
-  while (*s) 
+  while (*s)
     WriteCom(1,s++);
   return 0;
 }
@@ -226,7 +226,7 @@ int egets(char *s,int Max)
   Len=0;
   c = 0;
   while ( (Len < Max-1) && (c != NEWLINE) )
-  {   
+  {
     while (!GetBufCount(&ComRXBuffer)); // wait for a character
     c = GetBuf(&ComRXBuffer);
     s[Len++] = c;
@@ -234,14 +234,14 @@ int egets(char *s,int Max)
   if (Len>0)
   {
     s[Len]=0;
-  }	
+  }
   return Len;
 }
 char HexDigit(int Value)
 {
   if ((Value >=0) && (Value < 10))
     return Value+'0';
-  else 
+  else
     return Value-10 + 'A';
 }
 void printHex(unsigned int Number)
