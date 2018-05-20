@@ -20,7 +20,8 @@ CCFLAGS=-mcpu=cortex-m0 -mthumb -g -Wall
 OBJS=	init.o \
 	serial.o \
 	spi.o \
-	main.o
+	main.o \
+  config.o
 
 # The default 'target' (output) is main.elf and it depends on the object files being there.
 # These object files are linked together to create main.elf
@@ -40,6 +41,9 @@ serial.o: serial.c
 
 spi.o: spi.c
 	$(CC) -c $(CCFLAGS) spi.c -o spi.o
+
+config.o: config.c
+	$(CC) -c $(CCFLAGS) config.c -o config.o
 
 # if someone types in 'make clean' then remove all object files and executables
 # associated wit this project
