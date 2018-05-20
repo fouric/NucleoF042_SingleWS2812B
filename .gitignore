@@ -1,0 +1,15 @@
+# NeoVim
+.*.swp
+
+# Lisp
+*.fasl
+
+# Emacs
+*~
+
+# spec files
+*.spec
+
+# c
+*.o
+*.elf
