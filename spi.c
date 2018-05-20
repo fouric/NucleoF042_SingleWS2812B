@@ -1,7 +1,8 @@
 #include <stdint.h>
 #include "stm32f042.h"
+#include "spi.h"
 
-void initSPI() {
+void spi_init() {
   // turn on the clock for the SPI interface
   RCC_APB2ENR |= BIT12;
 
@@ -26,7 +27,7 @@ void initSPI() {
 }
 
 
-void writeSPI(uint8_t *data, unsigned count) {
+void spi_write(uint8_t *data, unsigned count) {
   while (count--) {
       SPI1_DR = (uint8_t)(*data);
       data++;

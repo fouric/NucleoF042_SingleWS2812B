@@ -18,6 +18,7 @@ extern unsigned char  BSS_END;
 const void * Vectors[] __attribute__((section(".vectors"))) ={
 	(void *)0x20001000,   /* Top of stack (4k) */
 	init,       /* Reset Handler */
+  // TODO/FIXME: figure out which of these darn handlers is invoked when "start"ing a program from gdb
 	Default_Handler,	/* NMI */
 	Default_Handler,	/* Hard Fault */
 	Default_Handler,	/* MemManage */

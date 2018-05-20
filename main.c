@@ -8,13 +8,6 @@
 #include "serial.h"
 #include "spi.h"
 
-// The following are 'declared' in the linker script
-extern unsigned char  INIT_DATA_VALUES;
-extern unsigned char  INIT_DATA_START;
-extern unsigned char  INIT_DATA_END;
-extern unsigned char  BSS_START;
-extern unsigned char  BSS_END;
-
 void delay(int);
 
 void delay(int dly) {
@@ -51,7 +44,7 @@ void writeWS2812B(unsigned long value) {
     }
 
     // Now send out the 24 (x3) bits to the SPI bus
-    writeSPI(data, 9);
+    spi_write(data, 9);
 
 }
 
@@ -144,7 +137,7 @@ int main() {
     initClock(); // set clock to 48 MHz, turn on flash prefetch, etc.
     initUART(9600);  // Set serial port to 9600,n,8,1
     configPins(); // Set up the pin to drive the onboard LDE
-    initSPI(); // set up the SPI bus
+    spi_init(); // set up the SPI bus
 
 
     while(1) {
