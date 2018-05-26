@@ -21,7 +21,8 @@ OBJS=	init.o \
 	serial.o \
 	spi.o \
 	main.o \
-  config.o
+	config.o \
+	support.o
 
 # The default 'target' (output) is main.elf and it depends on the object files being there.
 # These object files are linked together to create main.elf
@@ -44,6 +45,9 @@ spi.o: spi.c
 
 config.o: config.c
 	$(CC) -c $(CCFLAGS) config.c -o config.o
+
+support.o: support.c
+	$(CC) -c $(CCFLAGS) support.c -o support.o
 
 # if someone types in 'make clean' then remove all object files and executables
 # associated wit this project
